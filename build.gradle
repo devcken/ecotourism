@@ -40,6 +40,8 @@ dependencies {
 
     runtime 'org.codehaus.groovy:groovy'
 
+    implementation 'com.opencsv:opencsv:4.5'
+
     testImplementation "org.spockframework:spock-core:${spockVersion}"
     testImplementation "org.spockframework:spock-spring:${spockVersion}"
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
