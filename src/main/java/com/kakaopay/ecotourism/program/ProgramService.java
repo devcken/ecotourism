@@ -1,4 +1,4 @@
-package com.kakaopay.ecotourism;
+package com.kakaopay.ecotourism.program;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -7,6 +7,6 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
-public class EcotourismService {
-    @NonNull private final EcotourismRepository ecotourismRepository;
+public class ProgramService {
+    @NonNull private final ProgramRepository programRepository;
 }
