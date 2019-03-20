@@ -16,6 +16,7 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.response
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters
 import static org.springframework.restdocs.request.RequestDocumentation.requestParameters
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 class ProgramControllerSpec extends ApiDocumentationSpec {
@@ -24,13 +25,14 @@ class ProgramControllerSpec extends ApiDocumentationSpec {
         mockMvc.perform(post('/ecotourism/programs')
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("count").value(110)) // 110 is the number of data from data.csv
                 .andDo(
                     document(
                             'initializing-programs',
                             preprocessRequest(modifyingUri, prettyPrint()),
                             preprocessResponse(prettyPrint()),
                             responseFields(
-                                    fieldWithPath('count').type(JsonFieldType.NUMBER)
+                                    fieldWithPath('count').type(JsonFieldType.NUMBER).description('')
                             )
                     )
                 )

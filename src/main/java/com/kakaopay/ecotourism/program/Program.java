@@ -7,9 +7,10 @@ import javax.persistence.*;
 
 @Entity
 @Data
+@Table(name="programs")
 public class Program {
     @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
     private int id;
 
     private String name;

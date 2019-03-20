@@ -2,11 +2,13 @@ package com.kakaopay.ecotourism.program;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import sun.plugin.util.ProgressMonitorAdapter;
 
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -17,8 +19,12 @@ public class ProgramController {
     @NonNull private final ProgramService programService;
 
     @PostMapping()
-    public ResponseEntity<?> initialize() {
-        return ResponseEntity.ok(null);
+    public ResponseEntity<Map> initialize() throws IOException {
+        val response = new HashMap<String, Integer>();
+
+        response.put("count", programService.initializePrograms());
+
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/regions/{regionId}")
