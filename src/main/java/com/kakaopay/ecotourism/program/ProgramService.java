@@ -70,7 +70,47 @@ public class ProgramService {
         return Pair.of(programs, regions.values());
     }
 
-    public List<ProgramProjection> programsByRegion(Integer regionId) {
+    List<ProgramProjection> programsByRegion(final Integer regionId) {
         return programRepository.findByRegion(regionId);
+    }
+
+    @Transactional
+    Program add(final Program program) {
+        val region = saveOrGetRegion(program.getRegionDetails());
+
+        program.setRegion(region);
+
+        return programRepository.save(program);
+    }
+
+    @Transactional
+    Optional<Program> modify(final Program program) {
+        return programRepository.findById(program.getId())
+            .map(p -> {
+                if (!p.getRegionDetails().equals(program.getRegionDetails())) {
+                    val region = saveOrGetRegion(program.getRegionDetails());
+
+                    p.setRegion(region);
+                    p.setRegionDetails(program.getRegionDetails());
+                }
+
+                p.setName(program.getName());
+                p.setTheme(program.getTheme());
+                p.setRegionDetails(program.getRegionDetails());
+                p.setIntro(program.getIntro());
+                p.setDetails(program.getDetails());
+
+                return Optional.of(programRepository.save(p));
+            }).orElse(Optional.empty());
+    }
+
+    private Region saveOrGetRegion(final String regionDetails) {
+        val regionName = regionDetails.split(" ")[0];
+        return regionService.region(regionName)
+            .orElseGet(() -> {
+                val r = new Region();
+                r.setName(regionName);
+                return regionService.save(r);
+            });
     }
 }

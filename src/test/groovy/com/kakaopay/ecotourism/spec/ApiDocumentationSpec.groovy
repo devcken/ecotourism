@@ -22,7 +22,7 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.mo
 @Transactional
 @Rollback
 class ApiDocumentationSpec extends Specification {
-    @Autowired final ObjectMapper objectMapper
+    @Autowired protected final ObjectMapper objectMapper
     @Autowired protected final MockMvc mockMvc
 
     final modifyingUri = modifyUris().host('ecotourism.kakaopay.com').port(5000)

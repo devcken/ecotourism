@@ -4,6 +4,7 @@ import com.kakaopay.ecotourism.region.Region;
 import lombok.Data;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name="programs")
@@ -12,14 +13,17 @@ import javax.persistence.*;
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private int id;
 
+    @NotNull
     private String name;
 
+    @NotNull
     private String theme;
 
     @ManyToOne()
     @JoinColumn(name="region_id")
     private Region region;
 
+    @NotNull
     private String regionDetails;
 
     private String intro;

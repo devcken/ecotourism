@@ -14,7 +14,7 @@ import static com.querydsl.core.types.Projections.bean;
 public class ProgramRepositoryImpl {
     private final JPAQueryFactory queryFactory;
 
-    public List<ProgramProjection> findByRegion(Integer regionId) {
+    public List<ProgramProjection> findByRegion(final Integer regionId) {
         return queryFactory
             .select(
                 bean(ProgramProjection.class,
