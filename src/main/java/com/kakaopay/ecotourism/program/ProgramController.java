@@ -7,8 +7,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.net.URI;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static java.lang.String.format;
 
@@ -18,18 +21,37 @@ import static java.lang.String.format;
 public class ProgramController {
     @NonNull private final ProgramService programService;
 
-//    @PostMapping()
-//    public ResponseEntity<Map> initialize() throws IOException {
-//        val response = new HashMap<String, Integer>();
-//
-//        response.put("count", programService.initializePrograms());
-//
-//        return ResponseEntity.ok(response);
-//    }
+    @PostMapping("/regions")
+    public ResponseEntity<Map> initialize() throws IOException {
+        val response = new HashMap<String, Integer>();
+
+        response.put("count", programService.initializePrograms());
+
+        return ResponseEntity.ok(response);
+    }
 
     @GetMapping("/regions/{regionId}")
     public ResponseEntity<List<ProgramProjection>> programs(@PathVariable final Integer regionId) {
         return ResponseEntity.ok(programService.programsByRegion(regionId));
+    }
+
+    @PutMapping("/regions")
+    public ResponseEntity programs(@RequestBody final Map<String, Object> params) { // Using @PathVariable it will be more RESTful.
+        if (!params.containsKey("region")) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        val regionAndPrograms = programService.programsByRegion(params.get("region").toString());
+
+        return regionAndPrograms.getFirst()
+            .map(r -> {
+                val response = new HashMap<String, Object>();
+
+                response.put("region", r.getId());
+                response.put("programs", regionAndPrograms.getSecond());
+
+                return ResponseEntity.ok(response);
+            }).orElse(ResponseEntity.noContent().build());
     }
 
     @PostMapping()

@@ -3,6 +3,7 @@ package com.kakaopay.ecotourism.program
 import com.kakaopay.ecotourism.spec.ApiDocumentationSpec
 import org.springframework.http.MediaType
 import org.springframework.restdocs.payload.JsonFieldType
+import spock.lang.Stepwise
 
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get
@@ -20,10 +21,11 @@ import static org.springframework.restdocs.request.RequestDocumentation.requestP
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
+@Stepwise
 class ProgramControllerSpec extends ApiDocumentationSpec {
     def 'initialize all programs'() {
         expect:
-        mockMvc.perform(post('/ecotourism/programs')
+        mockMvc.perform(post('/ecotourism/programs/regions')
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("count").value(110)) // 110 is the number of data from data.csv
@@ -49,7 +51,7 @@ class ProgramControllerSpec extends ApiDocumentationSpec {
                 .andExpect(status().isOk())
                 .andDo(
                     document(
-                            'retrieving-programs',
+                            'retrieving-programs-by-region-id',
                             preprocessRequest(modifyingUri, prettyPrint()),
                             preprocessResponse(prettyPrint()),
                             responseFields(
@@ -66,9 +68,35 @@ class ProgramControllerSpec extends ApiDocumentationSpec {
                 )
     }
 
+    def 'retrieving programs being held in a given region'() {
+        given:
+        final regionName = '서울'
+
+        expect:
+        mockMvc.perform(put('/ecotourism/programs/regions')
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(String.format('{"region": "%s"}', regionName)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath('region').isNumber())
+                .andExpect(jsonPath('programs').isArray())
+                .andDo(
+                    document(
+                            'retrieving-programs-by-region-name',
+                            preprocessRequest(modifyingUri, prettyPrint()),
+                            preprocessResponse(prettyPrint()),
+                            responseFields(
+                                    fieldWithPath('region').type(JsonFieldType.NUMBER).description(''),
+                                    fieldWithPath('programs.[].name').type(JsonFieldType.STRING).description('').optional(),
+                                    fieldWithPath('programs.[].theme').type(JsonFieldType.STRING).description('').optional(),
+                            )
+                    )
+                )
+    }
+
     def 'add a new program'() {
         given:
-        final program = new Program(name: 'NewYork Central Park', theme: 'Urban park, Public park', regionDetails: 'Manhattan New York City', intro: 'Central Park is an urban park in Manhattan, New York City. It is located between the Upper West Side and Upper East Side, roughly bounded by Fifth Avenue on the east, Central Park West (Eighth Avenue) on the west, Central Park South (59th Street) on the south, and Central Park North (110th Street) on the north. Central Park is the most visited urban park in the United States, with 40 million visitors in 2013, and one of the most filmed locations in the world. In terms of area, Central Park is the fifth largest park in New York City, covering 843 acres (341 ha).', details: 'Central Park was designed in 1858 by landscape architect and writer Frederick Law Olmsted and the English architect Calvert Vaux, who also designed Brooklyn\'s Prospect Park. Central Park has been a National Historic Landmark since 1962.' +
+        final program = new Program(name: 'NewYork Central Park', theme: 'Urban park, Public park', regionDetails: 'Manhattan NewYork City', intro: 'Central Park is an urban park in Manhattan, New York City. It is located between the Upper West Side and Upper East Side, roughly bounded by Fifth Avenue on the east, Central Park West (Eighth Avenue) on the west, Central Park South (59th Street) on the south, and Central Park North (110th Street) on the north. Central Park is the most visited urban park in the United States, with 40 million visitors in 2013, and one of the most filmed locations in the world. In terms of area, Central Park is the fifth largest park in New York City, covering 843 acres (341 ha).', details: 'Central Park was designed in 1858 by landscape architect and writer Frederick Law Olmsted and the English architect Calvert Vaux, who also designed Brooklyn\'s Prospect Park. Central Park has been a National Historic Landmark since 1962.' +
                 '\n' +
                 'Central Park is the fifth-largest park in New York City, behind Flushing Meadows-Corona Park, Van Cortlandt Park, the Staten Island Greenbelt, and Pelham Bay Park. Central Park is located on 843 acres (3.41 km2; 1.317 sq mi) of land, although its original area was 770 acres (3.1 km2). The park, with a perimeter of 6.1 miles (9.8 km), is bordered on the north by Central Park North (110th Street), on the south by Central Park South (59th Street), on the west by Central Park West (Eighth Avenue), and on the east by Fifth Avenue. It is 2.5 miles (4 km) long between Central Park South and Central Park North, and is 0.5 mile (0.8 km) wide between Fifth Avenue and Central Park West.\n' +
                 '\n' +
@@ -82,8 +110,8 @@ class ProgramControllerSpec extends ApiDocumentationSpec {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath('name').value('NewYork Central Park'))
                 .andExpect(jsonPath('theme').value('Urban park, Public park'))
-                .andExpect(jsonPath('region.name').value('Manhattan'))
-                .andExpect(jsonPath('region_details').value('Manhattan New York City'))
+                .andExpect(jsonPath('region.name').value('Manhattan NewYork'))
+                .andExpect(jsonPath('region_details').value('Manhattan NewYork City'))
                 .andExpect(jsonPath('intro').isNotEmpty())
                 .andExpect(jsonPath('details').isNotEmpty())
                 .andDo(
@@ -152,7 +180,7 @@ class ProgramControllerSpec extends ApiDocumentationSpec {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath('name').value('Serengeti National'))
                 .andExpect(jsonPath('theme').value('National'))
-                .andExpect(jsonPath('region.name').value('Mara'))
+                .andExpect(jsonPath('region.name').value('Mara Tanzani'))
                 .andExpect(jsonPath('region_details').value('Mara Tanzani'))
                 .andExpect(jsonPath('intro').isNotEmpty())
                 .andExpect(jsonPath('details').isNotEmpty())
@@ -175,7 +203,7 @@ class ProgramControllerSpec extends ApiDocumentationSpec {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath('name').value('Serengeti National Park'))
                 .andExpect(jsonPath('theme').value('National Park'))
-                .andExpect(jsonPath('region.name').value('Mara'))
+                .andExpect(jsonPath('region.name').value('Mara Tanzania'))
                 .andExpect(jsonPath('region_details').value('Mara Tanzania'))
                 .andExpect(jsonPath('intro').isNotEmpty())
                 .andExpect(jsonPath('details').isNotEmpty())

@@ -21,6 +21,10 @@ public class RegionService {
         return regionRepository.findByName(name);
     }
 
+    public Optional<Region> regionLike(final String regionLike) {
+        return regionRepository.findTop1ByNameContainingOrderByName(regionLike);
+    }
+
     public Region save(final Region region) {
         return regionRepository.save(region);
     }

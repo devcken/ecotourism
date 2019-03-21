@@ -8,4 +8,6 @@ import java.util.Optional;
 @Repository
 public interface RegionRepository extends JpaRepository<Region, Integer> {
     Optional<Region> findByName(String name);
+
+    Optional<Region> findTop1ByNameContainingOrderByName(String regionLike);
 }

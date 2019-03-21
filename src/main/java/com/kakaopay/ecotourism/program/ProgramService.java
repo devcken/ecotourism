@@ -15,6 +15,8 @@ import java.io.InputStreamReader;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static java.lang.String.format;
+
 @Service
 @RequiredArgsConstructor
 public class ProgramService {
@@ -36,7 +38,7 @@ public class ProgramService {
             program.setName(x[1]);
             program.setTheme(x[2]);
             program.setRegionDetails(x[3]);
-            program.setRegion(regions.get(program.getRegionDetails().split(" ")[0]));
+            program.setRegion(regions.get(extractRegionName(program.getRegionDetails())));
             program.setIntro(x[4]);
             program.setDetails(x[5]);
             return program;
@@ -53,10 +55,9 @@ public class ProgramService {
             String[] programData;
 
             while ((programData = csvReader.readNext()) != null) {
-                val regionDetails = programData[3];
-                val regionName = regionDetails.split(" ")[0];
-
                 programs.add(programData);
+
+                val regionName = extractRegionName(programData[3]);
 
                 if (!regions.containsKey(regionName)) {
                     val region = new Region();
@@ -72,6 +73,12 @@ public class ProgramService {
 
     List<ProgramProjection> programsByRegion(final Integer regionId) {
         return programRepository.findByRegion(regionId);
+    }
+
+    Pair<Optional<Region>, List<ProgramProjection>> programsByRegion(final String region) {
+        return regionService.regionLike(region)
+            .map(r -> Pair.of(Optional.of(r), programsByRegion(r.getId())))
+            .orElse(Pair.of(Optional.empty(), new ArrayList<>()));
     }
 
     @Transactional
@@ -105,12 +112,18 @@ public class ProgramService {
     }
 
     private Region saveOrGetRegion(final String regionDetails) {
-        val regionName = regionDetails.split(" ")[0];
+        val regionName = extractRegionName(regionDetails);
         return regionService.region(regionName)
             .orElseGet(() -> {
                 val r = new Region();
                 r.setName(regionName);
                 return regionService.save(r);
             });
+    }
+
+    String extractRegionName(final String regionDetails) {
+        val regionValues = regionDetails.split(" ");
+        return regionValues.length >= 2 ?
+            format("%s %s", regionValues[0], regionValues[1].trim().replace(",", "")) : regionValues[0];
     }
 }

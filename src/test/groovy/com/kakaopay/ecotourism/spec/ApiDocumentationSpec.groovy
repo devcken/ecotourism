@@ -14,13 +14,12 @@ import spock.lang.Specification
 
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.modifyUris
 
-@SpringBootTest
+@SpringBootTest()
 @ActiveProfiles("test")
 @AutoConfigureRestDocs
 @AutoConfigureMockMvc
 @Category(ApiDocumentationSpec)
-@Transactional
-@Rollback
+//@Transactional
 class ApiDocumentationSpec extends Specification {
     @Autowired protected final ObjectMapper objectMapper
     @Autowired protected final MockMvc mockMvc
