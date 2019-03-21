@@ -1,5 +1,6 @@
 package com.kakaopay.ecotourism.program;
 
+import com.kakaopay.ecotourism.program.projection.ProgramProjection;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
@@ -52,6 +53,19 @@ public class ProgramController {
 
                 return ResponseEntity.ok(response);
             }).orElse(ResponseEntity.noContent().build());
+    }
+
+    @PostMapping("/numbers")
+    public ResponseEntity numberOfProgramsByKeyword(@RequestBody final Map<String, Object> params) { // Using @PathVariable it will be more RESTful.
+        if (!params.containsKey("keyword")) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        val numberOfPrograms = programService.numberOfPrograms(params.get("keyword").toString());
+
+        params.put("programs", numberOfPrograms);
+
+        return ResponseEntity.ok(params);
     }
 
     @PostMapping()

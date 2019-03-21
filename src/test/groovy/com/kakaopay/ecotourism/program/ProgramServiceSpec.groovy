@@ -4,7 +4,7 @@ import com.kakaopay.ecotourism.region.RegionService
 import spock.lang.Specification
 
 class ProgramServiceSpec extends Specification {
-    final programRepository = Mock(ProgramRepository)
+    final programRepository = Mock(ProgramRepositoryCustom)
     final regionService = Mock(RegionService)
     final programService = new ProgramService(programRepository, regionService)
 

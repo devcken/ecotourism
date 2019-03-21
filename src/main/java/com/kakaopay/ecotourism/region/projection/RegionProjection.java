@@ -1,4 +1,4 @@
-package com.kakaopay.ecotourism.region;
+package com.kakaopay.ecotourism.region.projection;
 
 import lombok.Data;
 

@@ -1,5 +1,7 @@
 package com.kakaopay.ecotourism.program;
 
+import com.kakaopay.ecotourism.program.projection.NumOfProgramProjection;
+import com.kakaopay.ecotourism.program.projection.ProgramProjection;
 import com.kakaopay.ecotourism.region.Region;
 import com.kakaopay.ecotourism.region.RegionService;
 import com.opencsv.CSVReaderBuilder;
@@ -79,6 +81,10 @@ public class ProgramService {
         return regionService.regionLike(region)
             .map(r -> Pair.of(Optional.of(r), programsByRegion(r.getId())))
             .orElse(Pair.of(Optional.empty(), new ArrayList<>()));
+    }
+
+    List<NumOfProgramProjection> numberOfPrograms(final String keyword) {
+        return programRepository.countByIntro(keyword);
     }
 
     @Transactional

@@ -94,6 +94,35 @@ class ProgramControllerSpec extends ApiDocumentationSpec {
                 )
     }
 
+    def 'retrieving the count of programs per region by a given keyword'() {
+        given:
+        final keyword = '역사'
+
+        expect:
+        mockMvc.perform(post('/ecotourism/programs/numbers')
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(String.format('{"keyword": "%s"}', keyword)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath('keyword').value(keyword))
+                .andExpect(jsonPath('programs').isArray())
+                .andExpect(jsonPath('programs.[0].region').value('경상남도 통영'))
+                .andExpect(jsonPath('programs.[0].count').value(3))
+                .andDo(
+                    document(
+                            'number-of-programs-per-region-by-keyword',
+                            preprocessRequest(modifyingUri, prettyPrint()),
+                            preprocessResponse(prettyPrint()),
+                            responseFields(
+                                    fieldWithPath('keyword').type(JsonFieldType.STRING).description(''),
+                                    fieldWithPath('programs').type(JsonFieldType.ARRAY).description(''),
+                                    fieldWithPath('programs.[].region').type(JsonFieldType.STRING).description(''),
+                                    fieldWithPath('programs.[].count').type(JsonFieldType.NUMBER).description('')
+                            )
+                    )
+                )
+    }
+
     def 'add a new program'() {
         given:
         final program = new Program(name: 'NewYork Central Park', theme: 'Urban park, Public park', regionDetails: 'Manhattan NewYork City', intro: 'Central Park is an urban park in Manhattan, New York City. It is located between the Upper West Side and Upper East Side, roughly bounded by Fifth Avenue on the east, Central Park West (Eighth Avenue) on the west, Central Park South (59th Street) on the south, and Central Park North (110th Street) on the north. Central Park is the most visited urban park in the United States, with 40 million visitors in 2013, and one of the most filmed locations in the world. In terms of area, Central Park is the fifth largest park in New York City, covering 843 acres (341 ha).', details: 'Central Park was designed in 1858 by landscape architect and writer Frederick Law Olmsted and the English architect Calvert Vaux, who also designed Brooklyn\'s Prospect Park. Central Park has been a National Historic Landmark since 1962.' +

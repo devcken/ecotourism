@@ -19,7 +19,6 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.mo
 @AutoConfigureRestDocs
 @AutoConfigureMockMvc
 @Category(ApiDocumentationSpec)
-//@Transactional
 class ApiDocumentationSpec extends Specification {
     @Autowired protected final ObjectMapper objectMapper
     @Autowired protected final MockMvc mockMvc

@@ -1,7 +1,7 @@
-package com.kakaopay.ecotourism.program;
+package com.kakaopay.ecotourism.program.projection;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.kakaopay.ecotourism.region.RegionProjection;
+import com.kakaopay.ecotourism.region.projection.RegionProjection;
 import lombok.Data;
 
 @Data public class ProgramProjection {
