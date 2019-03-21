@@ -2,24 +2,21 @@ package com.kakaopay.ecotourism.program;
 
 import com.kakaopay.ecotourism.region.Region;
 import com.kakaopay.ecotourism.region.RegionService;
-import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@RequiredArgsConstructor
 public class ProgramService {
     @NonNull private final ProgramRepository programRepository;
 
@@ -71,5 +68,9 @@ public class ProgramService {
         }
 
         return Pair.of(programs, regions.values());
+    }
+
+    public List<ProgramProjection> programsByRegion(Integer regionId) {
+        return programRepository.findByRegion(regionId);
     }
 }

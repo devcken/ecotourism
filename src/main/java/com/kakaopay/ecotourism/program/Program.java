@@ -6,9 +6,8 @@ import lombok.Data;
 import javax.persistence.*;
 
 @Entity
-@Data
 @Table(name="programs")
-public class Program {
+@Data public class Program {
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private int id;
@@ -17,7 +16,7 @@ public class Program {
 
     private String theme;
 
-    @ManyToOne(targetEntity=Region.class)
+    @ManyToOne()
     @JoinColumn(name="region_id")
     private Region region;
 

@@ -5,9 +5,8 @@ import lombok.Data;
 import javax.persistence.*;
 
 @Entity
-@Data
 @Table(name="regions")
-public class Region {
+@Data public class Region {
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private int id;

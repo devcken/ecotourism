@@ -52,7 +52,14 @@ class ProgramControllerSpec extends ApiDocumentationSpec {
                             preprocessRequest(modifyingUri, prettyPrint()),
                             preprocessResponse(prettyPrint()),
                             responseFields(
-                                    fieldWithPath('')
+                                    fieldWithPath('[].id').type(JsonFieldType.NUMBER).description('').optional(),
+                                    fieldWithPath('[].name').type(JsonFieldType.STRING).description('').optional(),
+                                    fieldWithPath('[].theme').type(JsonFieldType.STRING).description('').optional(),
+                                    fieldWithPath('[].region.id').type(JsonFieldType.NUMBER).description('').optional(),
+                                    fieldWithPath('[].region.name').type(JsonFieldType.STRING).description('').optional(),
+                                    fieldWithPath('[].region_details').type(JsonFieldType.STRING).description('').optional(),
+                                    fieldWithPath('[].intro').type(JsonFieldType.STRING).description('').optional(),
+                                    fieldWithPath('[].details').type(JsonFieldType.STRING).description('').optional()
                             )
                     )
                 )
