@@ -51,7 +51,7 @@ class ProgramControllerSpec extends ApiDocumentationSpec {
                 .andExpect(status().isOk())
                 .andDo(
                     document(
-                            'retrieving-programs-by-region-id',
+                            'programs-by-region-id',
                             preprocessRequest(modifyingUri, prettyPrint()),
                             preprocessResponse(prettyPrint()),
                             responseFields(
@@ -82,7 +82,7 @@ class ProgramControllerSpec extends ApiDocumentationSpec {
                 .andExpect(jsonPath('programs').isArray())
                 .andDo(
                     document(
-                            'retrieving-programs-by-region-name',
+                            'programs-by-region-name',
                             preprocessRequest(modifyingUri, prettyPrint()),
                             preprocessResponse(prettyPrint()),
                             responseFields(
@@ -110,7 +110,7 @@ class ProgramControllerSpec extends ApiDocumentationSpec {
                 .andExpect(jsonPath('programs.[0].count').value(3))
                 .andDo(
                     document(
-                            'number-of-programs-per-region-by-keyword',
+                            'count-of-programs-per-region-by-keyword',
                             preprocessRequest(modifyingUri, prettyPrint()),
                             preprocessResponse(prettyPrint()),
                             responseFields(
@@ -118,6 +118,31 @@ class ProgramControllerSpec extends ApiDocumentationSpec {
                                     fieldWithPath('programs').type(JsonFieldType.ARRAY).description(''),
                                     fieldWithPath('programs.[].region').type(JsonFieldType.STRING).description(''),
                                     fieldWithPath('programs.[].count').type(JsonFieldType.NUMBER).description('')
+                            )
+                    )
+                )
+    }
+
+    def 'get term frequency for a given keyword'() {
+        given:
+        final keyword = '문화'
+
+        expect:
+        mockMvc.perform(post('/ecotourism/programs/tf')
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(String.format('{"keyword": "%s"}', keyword)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath('keyword').value(keyword))
+                .andExpect(jsonPath('count').value(59))
+                .andDo(
+                    document(
+                            'term-frequency-by-keyword',
+                            preprocessRequest(modifyingUri, prettyPrint()),
+                            preprocessResponse(prettyPrint()),
+                            responseFields(
+                                    fieldWithPath('keyword').type(JsonFieldType.STRING).description(''),
+                                    fieldWithPath('count').type(JsonFieldType.NUMBER).description('')
                             )
                     )
                 )

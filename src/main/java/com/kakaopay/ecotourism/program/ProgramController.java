@@ -68,6 +68,19 @@ public class ProgramController {
         return ResponseEntity.ok(params);
     }
 
+    @PostMapping("/tf")
+    public ResponseEntity termFrequencyByKeyword(@RequestBody final Map<String, Object> params) {
+        if (!params.containsKey("keyword")) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        val termFrequency = programService.termFrequency(params.get("keyword").toString());
+
+        params.put("count", termFrequency);
+
+        return ResponseEntity.ok(params);
+    }
+
     @PostMapping()
     public ResponseEntity<Program> addProgram(@RequestBody @Valid final Program program) {
         val p = programService.add(program);

@@ -56,4 +56,16 @@ public class ProgramRepositoryImpl {
             .orderBy(region.name.asc())
             .fetch();
     }
+
+    public List<ProgramProjection> findByDetailsContaining(final String keyword) {
+        return queryFactory
+            .select(
+                bean(ProgramProjection.class,
+                    program.details
+                )
+            )
+            .from(program)
+            .where(program.details.contains(keyword))
+            .fetch();
+    }
 }

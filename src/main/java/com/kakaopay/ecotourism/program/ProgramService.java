@@ -5,6 +5,7 @@ import com.kakaopay.ecotourism.program.projection.ProgramProjection;
 import com.kakaopay.ecotourism.region.Region;
 import com.kakaopay.ecotourism.region.RegionService;
 import com.opencsv.CSVReaderBuilder;
+import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
@@ -85,6 +86,18 @@ public class ProgramService {
 
     List<NumOfProgramProjection> numberOfPrograms(final String keyword) {
         return programRepository.countByIntro(keyword);
+    }
+
+    Integer termFrequency(final String keyword) {
+        return programRepository.findByDetailsContaining(keyword)
+            .stream()
+            .map(p -> termFrequency(p.getDetails(), keyword, 0))
+            .reduce(0, (x, y) -> x + y);
+    }
+
+    int termFrequency(final String document, final String term, final int tf) {
+        return document.contains(term) ?
+            termFrequency(document.substring(document.indexOf(term) + term.length()), term, tf + 1) : tf;
     }
 
     @Transactional

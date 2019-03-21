@@ -4,7 +4,7 @@ import com.kakaopay.ecotourism.region.RegionService
 import spock.lang.Specification
 
 class ProgramServiceSpec extends Specification {
-    final programRepository = Mock(ProgramRepositoryCustom)
+    final programRepository = Mock(ProgramRepository)
     final regionService = Mock(RegionService)
     final programService = new ProgramService(programRepository, regionService)
 
@@ -26,5 +26,16 @@ class ProgramServiceSpec extends Specification {
         "a"            | "a"
         "a b"          | "a b"
         "a b c"        | "a b"
+    }
+
+    def 'term frequency'(String document, String term, int frequency) {
+        expect:
+        programService.termFrequency(document, term, 0) == frequency
+
+        where:
+        document                                                               | term         | frequency
+        'You can go apple picking in one of the many area apple orchards.'     | 'apple'      | 2
+        'You can go apple picking in one of the many area apple orchards.'     | 'strawberry' | 0
+        '국민의 국민에 의한 국민을 위한'                                              | '국민'        | 3
     }
 }
