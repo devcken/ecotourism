@@ -81,6 +81,25 @@ public class ProgramController {
         return ResponseEntity.ok(params);
     }
 
+    @PostMapping("/recommendation")
+    public ResponseEntity recommendProgramByKeyword(@RequestBody final Map<String, Object> params) {
+        if (!params.containsKey("region") || !params.containsKey("keyword")) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        val region = params.get("region").toString();
+        val keyword = params.get("keyword").toString();
+
+        params.clear();
+
+        return programService.findRecommendedProgram(region, keyword)
+            .map(p -> {
+                params.put("program", p.getId());
+                return ResponseEntity.ok(params);
+            })
+            .orElse(ResponseEntity.noContent().build());
+    }
+
     @PostMapping()
     public ResponseEntity<Program> addProgram(@RequestBody @Valid final Program program) {
         val p = programService.add(program);

@@ -15,9 +15,6 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.pr
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields
-import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName
-import static org.springframework.restdocs.request.RequestDocumentation.pathParameters
-import static org.springframework.restdocs.request.RequestDocumentation.requestParameters
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
@@ -146,6 +143,42 @@ class ProgramControllerSpec extends ApiDocumentationSpec {
                             )
                     )
                 )
+    }
+
+    def 'recommend ecotourism program by region and keyword'() {
+        when:
+        final region1 = '평창'
+        final keyword1 = '국립공원'
+
+        then:
+        mockMvc.perform(post('/ecotourism/programs/recommendation')
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(String.format('{"region": "%s", "keyword": "%s"}', region1, keyword1)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath('program').value(12))
+                .andDo(
+                    document(
+                            'program-recommendation-by-region-and-keyword',
+                            preprocessRequest(modifyingUri, prettyPrint()),
+                            preprocessResponse(prettyPrint()),
+                            responseFields(
+                                    fieldWithPath('program').type(JsonFieldType.NUMBER).description('')
+                            )
+                    )
+                )
+
+        when:
+        final region2 = '남해'
+        final keyword2 = '생태체험'
+
+        then:
+        mockMvc.perform(post('/ecotourism/programs/recommendation')
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(String.format('{"region": "%s", "keyword": "%s"}', region2, keyword2)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath('program').value(22))
     }
 
     def 'add a new program'() {

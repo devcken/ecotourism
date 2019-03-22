@@ -5,7 +5,6 @@ import com.kakaopay.ecotourism.program.projection.ProgramProjection;
 import com.kakaopay.ecotourism.region.Region;
 import com.kakaopay.ecotourism.region.RegionService;
 import com.opencsv.CSVReaderBuilder;
-import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
@@ -17,6 +16,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static java.lang.String.format;
 
@@ -98,6 +98,41 @@ public class ProgramService {
     int termFrequency(final String document, final String term, final int tf) {
         return document.contains(term) ?
             termFrequency(document.substring(document.indexOf(term) + term.length()), term, tf + 1) : tf;
+    }
+
+    Optional<ProgramProjection> findRecommendedProgram(final String region, final String keyword) {
+        val programs = programsByRegion(region);
+
+        if (!programs.getFirst().isPresent() || programs.getSecond().size() == 0) {
+            return Optional.empty();
+        }
+
+        val documents = programs.getSecond().stream()
+            .map(p -> format("%s %s %s", p.getTheme(), p.getIntro(), p.getDetails()))
+            .collect(Collectors.toList());
+
+        val tfIdfs = tfIdfs(documents, keyword);
+
+        val maxIndex = IntStream.range(0, tfIdfs.size())
+            .boxed()
+            .max(Comparator.comparing(tfIdfs::get))
+            .orElse(-1);
+
+        return maxIndex >= programs.getSecond().size() ? Optional.empty() : Optional.of(programs.getSecond().get(maxIndex));
+    }
+
+    List<Double> tfIdfs(final List<String> documents, final String term) {
+        val idf = inverseDocumentFrequency(documents, term);
+
+        return documents.stream().map(d -> termFrequency(d, term, 0) * idf).collect(Collectors.toList());
+    }
+
+    double inverseDocumentFrequency(final List<String> documents, final String term) {
+        val docSize = documents.size();
+        val docCountForTerm = documents.stream().filter(d -> d.contains(term)).mapToDouble(d -> 1).sum();
+        val df = docSize / docCountForTerm;
+
+        return Math.log10(df);
     }
 
     @Transactional
