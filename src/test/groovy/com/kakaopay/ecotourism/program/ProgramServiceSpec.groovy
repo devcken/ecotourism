@@ -16,7 +16,7 @@ class ProgramServiceSpec extends Specification {
 
         expect:
         data.first.size() == 110
-        data.second.size() == 10
+        data.second.size() == 47
     }
 
     def 'extracting region name from detail of regions'(String regionDetails, String regionName) {
