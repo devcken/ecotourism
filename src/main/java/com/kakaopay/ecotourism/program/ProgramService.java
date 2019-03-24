@@ -27,6 +27,10 @@ public class ProgramService {
 
     @NonNull private final RegionService regionService;
 
+    private final static double PROGRAM_THEME_WEIGHT = 0.2;
+    private final static double PROGRAM_INTRO_WEIGHT = 0.5;
+    private final static double PROGRAM_DETAILS_WEIGHT = 0.3;
+
     @Transactional
     int initializePrograms() throws IOException {
         programRepository.deleteAll();
@@ -107,11 +111,7 @@ public class ProgramService {
             return Optional.empty();
         }
 
-        val documents = programs.getSecond().stream()
-            .map(p -> format("%s %s %s", p.getTheme(), p.getIntro(), p.getDetails()))
-            .collect(Collectors.toList());
-
-        val tfIdfs = tfIdfs(documents, keyword);
+        val tfIdfs = tfIdfs(programs.getSecond(), keyword);
 
         val maxIndex = IntStream.range(0, tfIdfs.size())
             .boxed()
@@ -121,10 +121,18 @@ public class ProgramService {
         return maxIndex >= programs.getSecond().size() ? Optional.empty() : Optional.of(programs.getSecond().get(maxIndex));
     }
 
-    List<Double> tfIdfs(final List<String> documents, final String term) {
-        val idf = inverseDocumentFrequency(documents, term);
+    List<Double> tfIdfs(final List<ProgramProjection> programs, final String term) {
+        val idf = inverseDocumentFrequency(programs.stream()
+            .map(p -> format("%s %s %s", p.getTheme(), p.getIntro(), p.getDetails()))
+            .collect(Collectors.toList()), term);
 
-        return documents.stream().map(d -> termFrequency(d, term, 0) * idf).collect(Collectors.toList());
+        return programs.stream().map(p -> {
+            val tf = termFrequency(p.getTheme(), term, 0) * PROGRAM_THEME_WEIGHT
+                + termFrequency(p.getIntro(), term, 0) * PROGRAM_INTRO_WEIGHT
+                + termFrequency(p.getDetails(), term, 0) * PROGRAM_DETAILS_WEIGHT;
+
+            return tf * idf;
+        }).collect(Collectors.toList());
     }
 
     double inverseDocumentFrequency(final List<String> documents, final String term) {

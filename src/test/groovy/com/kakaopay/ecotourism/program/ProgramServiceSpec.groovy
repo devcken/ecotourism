@@ -62,16 +62,27 @@ class ProgramServiceSpec extends Specification {
 
     def 'tf-idf'(String term, List tfIdfs) {
         given:
-        final documents = ['대한민국은 민주공화국이다.', '대한민국의 주권은 국민에게 있고, 모든 권력은 국민으로부터 나온다.',
-                           '대한민국의 국민이 되는 요건은 법률로 정한다.', '국가는 법률이 정하는 바에 의하여 재외국민을 보호할 의무를 진다.']
+        final programs = [
+                new ProgramProjection(theme: '아동·청소년 체험학습', intro: '1일차: 어름치마을 인근 탐방, 2일차: 오대산국립공원 탐방, 3일차: 봉평마을 탐방', details: ' 1일차: 백룡동굴, 민물고기생태관 체험, 칠족령 트레킹\n' +
+                        ' 2일차: 대관령 양떼목장, 신재생 에너지전시관, 오대산국립공원\n' +
+                        ' 3일차: 이효석 문학관, 봉평마을'),
+                new ProgramProjection(theme: '숲 치유,', intro: '선재길, 한국자생식물원, 전나무숲, 월정사, 방아다리약수', details: ' 천년의 숲으로 불리는 오대산 전나무숲과 선재길에서 다양한 숲치유 프로그램 체험'),
+                new ProgramProjection(theme: '자연생태,', intro: '소금강, 삼산테마파크', details: ' 오대산국립공원의 대표 경관인 소금강지구에서 대자연의 아름다움을 제대로 즐긴다.'),
+                new ProgramProjection(theme: '문화생태체험,자연생태체험,', intro: '오대산국립공원 전나무숲, 월정사, 상원사, 신재생에너지전시관, 대관령 양떼목장, 한국자생식물원, 허브나라', details: ' - 전나무숲 생태체험\n' +
+                        ' - 월정사, 상원사 역사문화 체험\n' +
+                        ' - 대관령 양떼목장 체험 \n' +
+                        ' - 신재생에너지관 체험\n' +
+                        ' - 한국자생식물원 체험\n' +
+                        ' - 허브나라 체험')
+        ]
 
         expect:
-        programService.tfIdfs(documents, term) == tfIdfs
+        programService.tfIdfs(programs, term) == tfIdfs
 
         where:
         term     | tfIdfs
-        '대한민국' | [0.12493873660829993, 0.12493873660829993, 0.12493873660829993, 0.0]
-        '국민'    | [0.0, 0.24987747321659987, 0.12493873660829993, 0.12493873660829993]
+        '국립공원' | [0.09995098928663995, 0.0, 0.03748162098248998, 0.062469368304149966]
+        '생태체험' | [0.0, 0.0, 0.0, 0.42144199392957366]
     }
 
     def 'get recommended program'(String keyword, ProgramProjection program) {
@@ -80,10 +91,17 @@ class ProgramServiceSpec extends Specification {
 
         regionService.regionLike(region) >> Optional.of(new Region(id: 1))
         programRepository.findByRegion(1) >> [
-                new ProgramProjection(theme: '', intro: '대한민국은 민주공화국이다.', details: ''),
-                new ProgramProjection(theme: '', intro: '대한민국의 주권은 국민에게 있고, 모든 권력은 국민으로부터 나온다.', details: ''),
-                new ProgramProjection(theme: '', intro: '대한민국의 국민이 되는 요건은 법률로 정한다.', details: ''),
-                new ProgramProjection(theme: '', intro: '국가는 법률이 정하는 바에 의하여 재외국민을 보호할 의무를 진다.', details: '')
+                new ProgramProjection(theme: '아동·청소년 체험학습', intro: '1일차: 어름치마을 인근 탐방, 2일차: 오대산국립공원 탐방, 3일차: 봉평마을 탐방', details: ' 1일차: 백룡동굴, 민물고기생태관 체험, 칠족령 트레킹\n' +
+                        ' 2일차: 대관령 양떼목장, 신재생 에너지전시관, 오대산국립공원\n' +
+                        ' 3일차: 이효석 문학관, 봉평마을'),
+                new ProgramProjection(theme: '숲 치유,', intro: '선재길, 한국자생식물원, 전나무숲, 월정사, 방아다리약수', details: ' 천년의 숲으로 불리는 오대산 전나무숲과 선재길에서 다양한 숲치유 프로그램 체험'),
+                new ProgramProjection(theme: '자연생태,', intro: '소금강, 삼산테마파크', details: ' 오대산국립공원의 대표 경관인 소금강지구에서 대자연의 아름다움을 제대로 즐긴다.'),
+                new ProgramProjection(theme: '문화생태체험,자연생태체험,', intro: '오대산국립공원 전나무숲, 월정사, 상원사, 신재생에너지전시관, 대관령 양떼목장, 한국자생식물원, 허브나라', details: ' - 전나무숲 생태체험\n' +
+                        ' - 월정사, 상원사 역사문화 체험\n' +
+                        ' - 대관령 양떼목장 체험 \n' +
+                        ' - 신재생에너지관 체험\n' +
+                        ' - 한국자생식물원 체험\n' +
+                        ' - 허브나라 체험')
         ]
 
         expect:
@@ -91,7 +109,14 @@ class ProgramServiceSpec extends Specification {
 
         where:
         keyword  | program
-        '대한민국' | new ProgramProjection(theme: '', intro: '대한민국은 민주공화국이다.', details: '')
-        '국민'    | new ProgramProjection(theme: '', intro: '대한민국의 주권은 국민에게 있고, 모든 권력은 국민으로부터 나온다.', details: '')
+        '국립공원' | new ProgramProjection(theme: '아동·청소년 체험학습', intro: '1일차: 어름치마을 인근 탐방, 2일차: 오대산국립공원 탐방, 3일차: 봉평마을 탐방', details: ' 1일차: 백룡동굴, 민물고기생태관 체험, 칠족령 트레킹\n' +
+                ' 2일차: 대관령 양떼목장, 신재생 에너지전시관, 오대산국립공원\n' +
+                ' 3일차: 이효석 문학관, 봉평마을')
+        '생태체험' | new ProgramProjection(theme: '문화생태체험,자연생태체험,', intro: '오대산국립공원 전나무숲, 월정사, 상원사, 신재생에너지전시관, 대관령 양떼목장, 한국자생식물원, 허브나라', details: ' - 전나무숲 생태체험\n' +
+                ' - 월정사, 상원사 역사문화 체험\n' +
+                ' - 대관령 양떼목장 체험 \n' +
+                ' - 신재생에너지관 체험\n' +
+                ' - 한국자생식물원 체험\n' +
+                ' - 허브나라 체험')
     }
 }
