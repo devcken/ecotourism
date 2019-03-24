@@ -43,7 +43,9 @@ sourceSets {
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
+
     implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.security.oauth.boot:spring-security-oauth2-autoconfigure:2.0.0.RELEASE'
 
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation'com.querydsl:querydsl-jpa'
@@ -89,13 +91,13 @@ querydsl {
 test {
     outputs.dir snippetsDir
     useJUnit {
-        excludeCategories 'com.kakaopay.ecotourism.ApiDocumentationSpec'
+        excludeCategories 'com.kakaopay.ecotourism.spec.ApiDocumentationSpec'
     }
 }
 
 task integrationTest(type: Test, group: 'verification') {
     useJUnit {
-        includeCategories 'com.kakaopay.ecotourism.ApiDocumentationSpec'
+        includeCategories 'com.kakaopay.ecotourism.spec.ApiDocumentationSpec'
     }
 }
 
@@ -109,4 +111,5 @@ flyway {
     url = flywayUrl
     user = flywayUsername
     password = flywayPassword
+    locations = ['classpath:db/migration', 'classpath:db/data']
 }

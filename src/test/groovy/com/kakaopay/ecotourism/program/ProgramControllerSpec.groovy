@@ -3,6 +3,7 @@ package com.kakaopay.ecotourism.program
 import com.kakaopay.ecotourism.spec.ApiDocumentationSpec
 import org.springframework.http.MediaType
 import org.springframework.restdocs.payload.JsonFieldType
+import spock.lang.Shared
 import spock.lang.Stepwise
 
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document
@@ -20,9 +21,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @Stepwise
 class ProgramControllerSpec extends ApiDocumentationSpec {
+    @Shared String accessToken
+
+    def setup() {
+        if (accessToken == null) {
+            accessToken = issueAccessToken()
+        }
+    }
+
     def 'initialize all programs'() {
         expect:
         mockMvc.perform(post('/ecotourism/programs/regions')
+                .header('Authorization', String.format('Bearer %s', accessToken))
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("count").value(110)) // 110 is the number of data from data.csv
@@ -44,6 +54,7 @@ class ProgramControllerSpec extends ApiDocumentationSpec {
 
         expect:
         mockMvc.perform(get('/ecotourism/programs/regions/{regionId}', regionId)
+                .header('Authorization', String.format('Bearer %s', accessToken))
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(
@@ -71,6 +82,7 @@ class ProgramControllerSpec extends ApiDocumentationSpec {
 
         expect:
         mockMvc.perform(put('/ecotourism/programs/regions')
+                .header('Authorization', String.format('Bearer %s', accessToken))
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(String.format('{"region": "%s"}', regionName)))
@@ -97,6 +109,7 @@ class ProgramControllerSpec extends ApiDocumentationSpec {
 
         expect:
         mockMvc.perform(post('/ecotourism/programs/numbers')
+                .header('Authorization', String.format('Bearer %s', accessToken))
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(String.format('{"keyword": "%s"}', keyword)))
@@ -126,6 +139,7 @@ class ProgramControllerSpec extends ApiDocumentationSpec {
 
         expect:
         mockMvc.perform(post('/ecotourism/programs/tf')
+                .header('Authorization', String.format('Bearer %s', accessToken))
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(String.format('{"keyword": "%s"}', keyword)))
@@ -152,6 +166,7 @@ class ProgramControllerSpec extends ApiDocumentationSpec {
 
         then:
         mockMvc.perform(post('/ecotourism/programs/recommendation')
+                .header('Authorization', String.format('Bearer %s', accessToken))
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(String.format('{"region": "%s", "keyword": "%s"}', region1, keyword1)))
@@ -174,6 +189,7 @@ class ProgramControllerSpec extends ApiDocumentationSpec {
 
         then:
         mockMvc.perform(post('/ecotourism/programs/recommendation')
+                .header('Authorization', String.format('Bearer %s', accessToken))
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(String.format('{"region": "%s", "keyword": "%s"}', region2, keyword2)))
@@ -191,6 +207,7 @@ class ProgramControllerSpec extends ApiDocumentationSpec {
 
         expect:
         mockMvc.perform(post('/ecotourism/programs')
+                .header('Authorization', String.format('Bearer %s', accessToken))
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(program)))
@@ -235,6 +252,7 @@ class ProgramControllerSpec extends ApiDocumentationSpec {
 
         expect:
         mockMvc.perform(post('/ecotourism/programs')
+                .header('Authorization', String.format('Bearer %s', accessToken))
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(program)))
@@ -247,6 +265,7 @@ class ProgramControllerSpec extends ApiDocumentationSpec {
 
         expect:
         mockMvc.perform(post('/ecotourism/programs')
+                .header('Authorization', String.format('Bearer %s', accessToken))
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(program)))
@@ -261,6 +280,7 @@ class ProgramControllerSpec extends ApiDocumentationSpec {
 
         then:
         final result = mockMvc.perform(post('/ecotourism/programs')
+                .header('Authorization', String.format('Bearer %s', accessToken))
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(program)))
@@ -284,6 +304,7 @@ class ProgramControllerSpec extends ApiDocumentationSpec {
 
         then:
         mockMvc.perform(put('/ecotourism/programs')
+                .header('Authorization', String.format('Bearer %s', accessToken))
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(addedProgram)))
@@ -330,6 +351,7 @@ class ProgramControllerSpec extends ApiDocumentationSpec {
 
         expect:
         mockMvc.perform(put('/ecotourism/programs')
+                .header('Authorization', String.format('Bearer %s', accessToken))
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(program)))
